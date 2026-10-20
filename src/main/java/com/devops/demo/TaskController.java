@@ -12,7 +12,7 @@ public class TaskController {
 
     @GetMapping("/health")
     public String health() {
-        return "Application is running!";
+        return "Application is running! CI/CD redeployment successful!";
     }
 
     @GetMapping("/tasks")
