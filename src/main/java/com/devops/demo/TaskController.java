@@ -9,10 +9,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class TaskController {
-    
+
     @GetMapping("/health")
     public String health() {
-        return "Application is running! CI/CD redeployment successful!";
+        return "helo from Srrihari";
     }
 
     @GetMapping("/tasks")
