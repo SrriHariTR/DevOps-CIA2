@@ -7,7 +7,7 @@
   tasks:
     - name: Apply Kubernetes deployment manifest
       ansible.builtin.command:
-        cmd: kubectl apply -f k8s/deployment.yaml
+        cmd: kubectl apply -f "{{ playbook_dir }}/../k8s/deployment.yaml"
 
     - name: Update deployment with latest CI image
       ansible.builtin.command:
@@ -15,7 +15,7 @@
 
     - name: Apply Kubernetes service
       ansible.builtin.command:
-        cmd: kubectl apply -f k8s/service.yaml
+        cmd: kubectl apply -f "{{ playbook_dir }}/../k8s/service.yaml"
 
     - name: Wait for deployment rollout
       ansible.builtin.command:
