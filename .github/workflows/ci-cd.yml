@@ -69,6 +69,12 @@ jobs:
           docker push "${{ vars.ACR_LOGIN_SERVER }}/devops-java-app:${{ github.sha }}"
           docker push "${{ vars.ACR_LOGIN_SERVER }}/devops-java-app:latest"
 
+      - name: Install Ansible
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
       - name: Connect to AKS
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         uses: azure/aks-set-context@v4
@@ -76,16 +82,14 @@ jobs:
           resource-group: rg-devops-cia2
           cluster-name: aks-devops-cia2
 
-      - name: Deploy application to AKS
+      - name: Deploy application using Ansible
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        uses: azure/k8s-deploy@v5
-        with:
-          action: deploy
-          manifests: |
-            k8s/deployment.yaml
-            k8s/service.yaml
-          images: |
-            ${{ vars.ACR_LOGIN_SERVER }}/devops-java-app:${{ github.sha }}
+        run: |
+          ansible-playbook \
+            -i 'localhost,' \
+            ansible/deploy.yml \
+            -e "acr_login_server=${{ vars.ACR_LOGIN_SERVER }}" \
+            -e "image_tag=${{ github.sha }}"
 
       - name: Verify Kubernetes deployment
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
