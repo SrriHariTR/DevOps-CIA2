@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Task Manager</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            margin: 0;
+            padding: 40px 20px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px #00000010;
+        }
+
+        h1 {
+            color: #2563eb;
+        }
+
+        .status {
+            background: #dcfce7;
+            color: #166534;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .task {
+            background: #f8fafc;
+            padding: 14px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        #message {
+            margin-top: 15px;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>DevOps Task Manager</h1>
+
+        <p>Java Spring Boot application deployed using Kubernetes.</p>
+
+        <div class="status" id="status">
+            Checking application status...
+        </div>
+
+        <h2>Available Tasks</h2>
+
+        <div id="tasks">Loading tasks...</div>
+
+        <button onclick="loadData()">Refresh Data</button>
+
+        <p id="message"></p>
+    </div>
+
+    <script>
+        async function loadData() {
+            const status = document.getElementById("status");
+            const tasks = document.getElementById("tasks");
+            const message = document.getElementById("message");
+
+            try {
+                const healthResponse = await fetch("/api/health");
+
+                if (!healthResponse.ok) {
+                    throw new Error("Health check failed");
+                }
+
+                const health = await healthResponse.text();
+
+                status.textContent = "Application Status: " + health;
+
+                const tasksResponse = await fetch("/api/tasks");
+
+                if (!tasksResponse.ok) {
+                    throw new Error("Could not fetch tasks");
+                }
+
+                const taskList = await tasksResponse.json();
+
+                tasks.innerHTML = "";
+
+                taskList.forEach(task => {
+                    const item = document.createElement("div");
+                    item.className = "task";
+                    item.textContent = "✓ " + task;
+                    tasks.appendChild(item);
+                });
+
+                message.textContent = "Data loaded successfully.";
+
+            } catch (error) {
+                status.textContent = "Application status unavailable";
+                tasks.textContent = "Unable to load tasks.";
+                message.textContent = error.message;
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
